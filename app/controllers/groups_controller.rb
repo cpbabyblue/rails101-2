@@ -10,6 +10,7 @@ class GroupsController < ApplicationController
 
   def show
     @group = Group.find(params[:id])
+    @posts = @group.posts
   end
 
  def edit
@@ -49,7 +50,7 @@ class GroupsController < ApplicationController
   end
 
   def destroy
-    
+
 
     @group.destroy
     flash[:alert] = "Group deleted"
