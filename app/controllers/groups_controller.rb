@@ -1,5 +1,7 @@
 class GroupsController < ApplicationController
   before_action :authenticate_user! , only: [:new, :create, :edit, :update, :destroy]
+  before_action :find_group_and_check_permission, only: [:edit, :update, :destroy]
+
 
   def index
     @groups = Group.all
@@ -11,11 +13,6 @@ class GroupsController < ApplicationController
   end
 
  def edit
-   @group = Group.find(params[:id])
-
-   if current_user != @group.user
-     redirect_to root_path, alert: "you have nooo permission."
-   end
 
  end
 
@@ -41,11 +38,7 @@ class GroupsController < ApplicationController
 
 
   def update
-    @group = Group.find(params[:id])
 
-    if current_user != @group.user
-      redirect_to root_path, alert: "you have nooo permission."
-    end
 
     if @group.update(group_params)
       redirect_to groups_path, notice: "updated successfully"
@@ -56,12 +49,8 @@ class GroupsController < ApplicationController
   end
 
   def destroy
-    @group = Group.find(params[:id])
-
-    if current_user != @group.user
-      redirect_to root_path, alert: "you have nooo permission."
-    end
     
+
     @group.destroy
     flash[:alert] = "Group deleted"
     redirect_to groups_path
@@ -70,6 +59,16 @@ class GroupsController < ApplicationController
 
 
 private
+
+def find_group_and_check_permission
+  @group = Group.find(params[:id])
+
+  if current_user != @group.user
+    redirect_to root_path, alert: "you have nooo permission."
+  end
+end
+
+
 
 def group_params
 
