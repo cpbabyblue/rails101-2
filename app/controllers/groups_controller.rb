@@ -1,5 +1,5 @@
 class GroupsController < ApplicationController
-  before_action :authenticate_user! , only: [:new, :create, :edit, :update, :destroy]
+  before_action :authenticate_user! , only: [:new, :create, :edit, :update, :destroy, :join, :quit]
   before_action :find_group_and_check_permission, only: [:edit, :update, :destroy]
 
 
@@ -11,7 +11,7 @@ class GroupsController < ApplicationController
   def show
     @group = Group.find(params[:id])
     @posts = @group.posts.recent.paginate(:page => params[:page], :per_page => 5)
-    
+
 
   end
 
@@ -59,6 +59,32 @@ class GroupsController < ApplicationController
     redirect_to groups_path
   end
 
+def join
+  @group = Group.find(params[:id])
+
+  if !current_user.is_member_of?(@group)
+    current_user.join!(@group)
+    flash[:notice] = "加入本讨论版成功！！！！！！"
+  else
+    flash[:warning] = "您已经是本讨论版的成员了！！！"
+  end
+
+  redirect_to group_path(@group)
+
+end
+
+def  quit
+
+  @group =  Group.find(params[:id])
+
+  if current_user.is_member_of?(@group)
+    current_user.quit!(@group)
+    flash[:alert] = "已经退出本版了！"
+  else
+    flash[:warning] = "您还不是本讨论版的成员，怎么退出啊啊啊LOL"
+  end
+  redirect_to group_path(@group)
+end
 
 
 private
